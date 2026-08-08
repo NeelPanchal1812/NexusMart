@@ -104,9 +104,9 @@
           <select name="sort" class="form-select form-select-md rounded-3 fw-semibold fs-7"
             onchange="this.form.submit()">
             <option value="">Default Featured</option>
-            <option value="low" {% if request.GET.sort=="low" %}selected{% endif %}>Price: Low to High ⬆️</option>
-            <option value="high" {% if request.GET.sort=="high" %}selected{% endif %}>Price: High to Low ⬇️</option>
-            <option value="new" {% if request.GET.sort=="new" %}selected{% endif %}>Newest Arrivals 🆕</option>
+            <option value="low" {% if request.GET.sort == 'low' %}selected{% endif %}>Price: Low to High ⬆️</option>
+            <option value="high" {% if request.GET.sort == 'high' %}selected{% endif %}>Price: High to Low ⬇️</option>
+            <option value="new" {% if request.GET.sort == 'new' %}selected{% endif %}>Newest Arrivals 🆕</option>
           </select>
         </div>
 
