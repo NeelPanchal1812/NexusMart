@@ -64,10 +64,12 @@ def toggle_wishlist(request, product_id):
         messages.success(request, msg)
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('ajax') == '1':
+        wishlist_count = Wishlist.objects.filter(user=request.user).count()
         return JsonResponse({
             'success': True,
             'added': added,
-            'message': msg
+            'message': msg,
+            'wishlist_count': wishlist_count
         })
 
     return redirect(request.META.get("HTTP_REFERER", "/"))

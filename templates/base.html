@@ -1158,10 +1158,11 @@ body.dark .search-input-glass {
 <div class="bottom-dock">
   <a href="/wishlist/" class="dock-item">
     <i class="fa-solid fa-heart text-danger fs-5"></i> Wishlist
+    <span class="dock-badge" id="wishlist-dock-badge" {% if wishlist_count == 0 %}style="display:none;"{% endif %}>{{ wishlist_count }}</span>
   </a>
   <a href="/orders/cart/" class="dock-item">
     <i class="fa-solid fa-cart-shopping text-primary fs-5"></i> Cart
-    <span class="dock-badge">{{ cart_count }}</span>
+    <span class="dock-badge" id="cart-dock-badge">{{ cart_count }}</span>
   </a>
 </div>
 {% endif %}
@@ -1441,11 +1442,11 @@ document.addEventListener("click", function(e) {
       if (data && data.success) {
         showToast(data.message, "success");
         // Update cart badge in bottom dock
-        const dockBadge = document.querySelector(".dock-badge");
-        if (dockBadge) {
-          dockBadge.textContent = data.cart_count;
-          dockBadge.style.transform = "scale(1.3)";
-          setTimeout(() => dockBadge.style.transform = "scale(1)", 300);
+        const cartBadge = document.getElementById("cart-dock-badge");
+        if (cartBadge && data.cart_count !== undefined) {
+          cartBadge.textContent = data.cart_count;
+          cartBadge.style.transform = "scale(1.3)";
+          setTimeout(() => cartBadge.style.transform = "scale(1)", 300);
         }
       }
     })
@@ -1475,6 +1476,14 @@ document.addEventListener("click", function(e) {
           } else {
             heartIcon.classList.remove("text-danger");
           }
+        }
+        // Update wishlist badge in bottom dock
+        const wishBadge = document.getElementById("wishlist-dock-badge");
+        if (wishBadge && data.wishlist_count !== undefined) {
+          wishBadge.textContent = data.wishlist_count;
+          wishBadge.style.display = data.wishlist_count > 0 ? "inline-block" : "none";
+          wishBadge.style.transform = "scale(1.3)";
+          setTimeout(() => wishBadge.style.transform = "scale(1)", 300);
         }
       }
     })
