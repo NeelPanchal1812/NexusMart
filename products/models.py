@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, connection
 from django.conf import settings
 from django.contrib.postgres.search import SearchVectorField, SearchVector
 from django.contrib.postgres.indexes import GinIndex
@@ -54,12 +54,13 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        Product.objects.filter(id=self.id).update(
-            search_vector=(
-                SearchVector("name", weight="A") +
-                SearchVector("description", weight="B")
+        if connection.vendor == 'postgresql':
+            Product.objects.filter(id=self.id).update(
+                search_vector=(
+                    SearchVector("name", weight="A") +
+                    SearchVector("description", weight="B")
+                )
             )
-        )
 
     def __str__(self):
         return self.name

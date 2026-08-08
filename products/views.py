@@ -35,6 +35,8 @@ def add_review(request, product_id):
     return redirect("product_detail", pk=product_id)
 
 
+from django.http import JsonResponse
+
 # ================= WISHLIST TOGGLE =================
 
 @login_required
@@ -49,13 +51,24 @@ def toggle_wishlist(request, product_id):
 
     if wishlist_item:
         wishlist_item.delete()
-        messages.warning(request, "Removed from wishlist ❤️")
+        added = False
+        msg = "Removed from wishlist ❤️"
+        messages.warning(request, msg)
     else:
         Wishlist.objects.create(
             user=request.user,
             product=product
         )
-        messages.success(request, "Added to wishlist ❤️")
+        added = True
+        msg = "Added to wishlist ❤️"
+        messages.success(request, msg)
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('ajax') == '1':
+        return JsonResponse({
+            'success': True,
+            'added': added,
+            'message': msg
+        })
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
@@ -114,12 +127,17 @@ def product_detail(request, pk):
         avg=Avg("rating")
     )["avg"] or 0
 
+    is_in_wishlist = False
+    if request.user.is_authenticated:
+        is_in_wishlist = Wishlist.objects.filter(user=request.user, product=product).exists()
+
     return render(request, "products/detail.html", {
         "product": product,
         "recommendations": recommendations,
         "reviews": reviews,
         "avg_rating": round(avg_rating, 1),
-        "recently_viewed": old_items  # optional, safe
+        "recently_viewed": old_items,
+        "is_in_wishlist": is_in_wishlist
     })
 
 
@@ -128,8 +146,17 @@ def product_detail(request, pk):
 def home(request):
 
     selected_category = request.GET.get("category")
+    q = request.GET.get("q", "").strip()
 
     products = Product.objects.prefetch_related("images")
+
+    # 🔍 Search filter
+    if q:
+        products = products.filter(
+            models.Q(name__icontains=q) |
+            models.Q(description__icontains=q) |
+            models.Q(category__name__icontains=q)
+        )
 
     # 📂 Category filter
     if selected_category and selected_category.isdigit():
@@ -180,8 +207,13 @@ def home(request):
 
     # 🕒 RECENTLY VIEWED (CATEGORY BASED)
     recent_products = []
+    wishlist_product_ids = set()
 
     if request.user.is_authenticated:
+
+        wishlist_product_ids = set(
+            Wishlist.objects.filter(user=request.user).values_list("product_id", flat=True)
+        )
 
         recent_products = RecentlyViewed.objects.select_related(
             "product"
@@ -201,7 +233,8 @@ def home(request):
         "products": products,
         "categories": categories,
         "popular_products": popular_products,
-        "recent_products": recent_products
+        "recent_products": recent_products,
+        "wishlist_product_ids": wishlist_product_ids
     })
 
 

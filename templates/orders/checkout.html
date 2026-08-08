@@ -1,50 +1,60 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="pro-section glass">
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8">
 
-<h3 class="mb-3 fw-bold">Checkout</h3>
+    <div class="card border-0 rounded-4 shadow-lg p-4 p-md-5" style="background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border) !important;">
+      
+      <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3" style="border-color: var(--card-border) !important;">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; font-size: 1.3rem;">
+            <i class="fa-solid fa-truck-fast"></i>
+          </div>
+          <div>
+            <h3 class="fw-extrabold mb-0" style="letter-spacing: -0.5px;">Checkout & Shipping</h3>
+            <span class="text-muted fs-7">Enter your delivery details to complete the order</span>
+          </div>
+        </div>
 
-<form method="post" novalidate>
-{% csrf_token %}
+        <button onclick="window.history.length > 1 ? history.back() : window.location.href='/orders/cart/'" class="btn btn-glass-outline btn-sm px-3 py-1.5 rounded-pill fw-semibold">
+          <i class="fa-solid fa-arrow-left me-1"></i> Back
+        </button>
+      </div>
 
-<div class="mb-3">
-<label>Full Name</label>
-<input type="text" name="full_name"
-class="form-control"
-value="{{ profile.full_name|default:'' }}" required>
-</div>
+      <form method="post" novalidate>
+        {% csrf_token %}
 
-<div class="mb-3">
-<label>Email</label>
-<input type="email" name="email"
-class="form-control"
-value="{{ user.email }}"
-pattern="^[\w\.-]+@[\w\.-]+\.\w+$" required>
-<small class="text-muted">Enter a valid email</small>
-</div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold fs-7"><i class="fa-solid fa-user me-1 text-primary"></i> Full Name</label>
+          <input type="text" name="full_name" class="form-control form-control-lg rounded-3 fs-6" value="{{ profile.full_name|default:'' }}" placeholder="John Doe" required>
+        </div>
 
-<div class="mb-3">
-<label>Phone</label>
-<input type="text" name="phone"
-class="form-control"
-value="{{ profile.phone|default:'' }}"
-pattern="^[6-9]\d{9}$" required>
-</div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold fs-7"><i class="fa-solid fa-envelope me-1 text-primary"></i> Email Address</label>
+          <input type="email" name="email" class="form-control form-control-lg rounded-3 fs-6" value="{{ user.email }}" pattern="^[\w\.-]+@[\w\.-]+\.\w+$" placeholder="name@example.com" required>
+          <small class="text-muted fs-7">We'll send your invoice to this email</small>
+        </div>
 
-<div class="mb-3">
-<label>Address</label>
-<textarea name="address"
-class="form-control"
-required>{{ profile.address|default:'' }}</textarea>
-</div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold fs-7"><i class="fa-solid fa-phone me-1 text-primary"></i> Phone Number</label>
+          <input type="text" name="phone" class="form-control form-control-lg rounded-3 fs-6" value="{{ profile.phone|default:'' }}" pattern="^[6-9]\d{9}$" placeholder="9876543210" required>
+        </div>
 
-<button class="btn btn-primary w-100 mt-3">
-Place Order
-</button>
+        <div class="mb-4">
+          <label class="form-label fw-semibold fs-7"><i class="fa-solid fa-location-dot me-1 text-primary"></i> Shipping Address</label>
+          <textarea name="address" class="form-control rounded-3 fs-6" rows="3" placeholder="Flat No, Building, Street, City, Pincode" required>{{ profile.address|default:'' }}</textarea>
+        </div>
 
-</form>
+        <button class="btn btn-gradient-primary btn-lg w-100 py-3 fs-6 fw-bold">
+          Proceed to Payment <i class="fa-solid fa-arrow-right ms-2"></i>
+        </button>
 
+      </form>
+
+    </div>
+
+  </div>
 </div>
 
 {% endblock %}

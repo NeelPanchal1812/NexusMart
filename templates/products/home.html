@@ -1,242 +1,546 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="row mt-3 g-4">
+<!-- ==========================================================================
+   HERO BANNER
+   ========================================================================== -->
+<div class="card border-0 rounded-4 mb-4 overflow-hidden shadow-lg position-relative"
+  style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 50%, rgba(236, 72, 153, 0.15) 100%); border: 1px solid var(--card-border) !important;">
+  <div class="card-body p-4 p-md-5 text-center text-md-start">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <span class="badge rounded-pill px-3 py-2 mb-3"
+          style="background: var(--primary-gradient); font-size: 0.85rem; letter-spacing: 0.5px;">
+          <i class="fa-solid fa-bolt me-1"></i> WELCOME TO NEXUS MART
+        </span>
+        <h1 class="display-5 fw-extrabold mb-3" style="letter-spacing: -1px; line-height: 1.15;">
+          Experience Next-Gen <span
+            style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Premium
+            Shopping</span>
+        </h1>
+        <p class="lead text-muted mb-4" style="max-width: 600px; font-size: 1.05rem;">
+          Explore top-tier smartphones, laptops, audio gear, and appliances with AI-powered recommendations and instant
+          checkout.
+        </p>
 
-<!-- ================= LEFT SIDEBAR ================= -->
-<div class="col-lg-3 col-md-4 col-12 mb-3">
+        <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start align-items-center">
+          <a href="#products-section" class="btn btn-gradient-primary btn-lg px-4 fs-6">
+            <i class="fa-solid fa-compass"></i> Explore Catalog
+          </a>
+          <button onclick="document.getElementById('chatbot-btn').click()"
+            class="btn btn-glass-outline btn-lg px-4 fs-6">
+            <i class="fa-solid fa-robot text-primary me-2"></i> Ask AI Bot
+          </button>
+        </div>
+      </div>
 
-<h5 class="mb-3 fw-bold">Categories</h5>
+      <div class="col-lg-5 d-none d-lg-block text-end position-relative">
+        <div class="hero-img-wrapper position-relative">
+          <img src="/media/hero_banner.png" onerror="this.src='/static/hero_banner.png'"
+            class="img-fluid rounded-4 shadow-lg border hero-banner-img" alt="NEXUS MART Showcase">
+          <span class="badge bg-success rounded-pill px-3 py-1.5 position-absolute top-0 end-0 translate-middle-y shadow-lg fw-bold fs-7 me-2">
+            <i class="fa-solid fa-sparkles me-1"></i> New Collection
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<ul class="list-group pro-sidebar">
+<div id="products-section" class="mb-4">
 
+  <!-- ================= TOP HORIZONTAL CATEGORIES BAR & FILTERS ================= -->
+  <div class="card border-0 rounded-4 shadow-sm p-4 mb-4"
+    style="background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border) !important;">
 
-{% for cat in categories %}
-<li class="list-group-item p-2 border-0
-{% if request.GET.category == cat.id|stringformat:'s' %}active{% endif %}">
+    <!-- Category Pills Row -->
+    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3"
+      style="border-color: var(--card-border) !important;">
+      <div class="d-flex align-items-center gap-2">
+        <h5 class="fw-extrabold mb-0 me-2" style="letter-spacing: -0.3px;">
+          <i class="fa-solid fa-layer-group text-primary me-1"></i> Categories
+        </h5>
+        {% if request.GET.category or request.GET.min_price or request.GET.max_price or request.GET.sort %}
+        <a href="/" class="badge bg-danger-subtle text-danger text-decoration-none px-3 py-1.5 rounded-pill fs-7">
+          <i class="fa-solid fa-rotate-left me-1"></i> Clear All Filters
+        </a>
+        {% endif %}
+      </div>
 
-<a href="?category={{ cat.id }}"
-class="text-decoration-none fw-semibold
-{% if request.GET.category == cat.id|stringformat:'s' %}
-text-white
-{% else %}
-text-dark
-{% endif %}">
-{{ cat.name }}
-</a>
+      <span class="text-muted fs-7 fw-semibold d-none d-md-inline">Explore by category or custom price filter</span>
+    </div>
 
-</li>
-{% endfor %}
+    <div class="category-pills-wrapper d-flex gap-2 overflow-x-auto pb-3 mb-3">
+      <a href="?{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}{% endif %}"
+        class="category-pill {% if not request.GET.category %}active-pill{% endif %}">
+        <i class="fa-solid fa-border-all me-1.5"></i> All Products
+      </a>
 
-</ul>
+      {% for cat in categories %}
+      <a href="?category={{ cat.id }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}"
+        class="category-pill {% if request.GET.category == cat.id|stringformat:'s' %}active-pill{% endif %}">
+        {% if 'Phone' in cat.name %}<i class="fa-solid fa-mobile-screen-button me-1.5"></i>
+        {% elif 'Laptop' in cat.name %}<i class="fa-solid fa-laptop me-1.5"></i>
+        {% elif 'Audio' in cat.name %}<i class="fa-solid fa-headphones me-1.5"></i>
+        {% elif 'Home' in cat.name %}<i class="fa-solid fa-house-laptop me-1.5"></i>
+        {% elif 'Kitchen' in cat.name %}<i class="fa-solid fa-blender me-1.5"></i>
+        {% else %}<i class="fa-solid fa-tag me-1.5"></i>{% endif %}
+        {{ cat.name }}
+      </a>
+      {% endfor %}
+    </div>
+
+    <!-- Filter & Sort Panel -->
+    <form method="get" action="/#products-section" id="filter-form" class="pt-2">
+      <input type="hidden" name="q" value="{{ request.GET.q|default:'' }}">
+      <input type="hidden" name="category" value="{{ request.GET.category|default:'' }}">
+
+      <div class="row g-3 align-items-center">
+
+        <!-- Sort Dropdown -->
+        <div class="col-lg-3 col-md-4">
+          <label class="form-label fs-7 fw-bold mb-1 text-muted"><i
+              class="fa-solid fa-arrow-down-short-wide me-1 text-primary"></i> Sort By</label>
+          <select name="sort" class="form-select form-select-md rounded-3 fw-semibold fs-7"
+            onchange="this.form.submit()">
+            <option value="">Default Featured</option>
+            <option value="low" {% if request.GET.sort=="low" %}selected{% endif %}>Price: Low to High ⬆️</option>
+            <option value="high" {% if request.GET.sort=="high" %}selected{% endif %}>Price: High to Low ⬇️</option>
+            <option value="new" {% if request.GET.sort=="new" %}selected{% endif %}>Newest Arrivals 🆕</option>
+          </select>
+        </div>
+
+        <!-- Price Range Inputs & Quick Preset Chips -->
+        <div class="col-lg-6 col-md-8">
+          <label class="form-label fs-7 fw-bold mb-1 text-muted d-flex justify-content-between">
+            <span><i class="fa-solid fa-indian-rupee-sign me-1 text-success"></i> Price Range</span>
+            <span id="price-range-display" class="text-primary fw-extrabold">All Prices</span>
+          </label>
+
+          <div class="d-flex align-items-center gap-2">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-transparent text-muted fw-bold">₹</span>
+              <input type="number" id="min-price-input" name="min_price" placeholder="Min Price"
+                class="form-control fw-semibold" value="{{ request.GET.min_price|default:'' }}" min="0" step="500">
+            </div>
+
+            <span class="text-muted fw-bold">-</span>
+
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-transparent text-muted fw-bold">₹</span>
+              <input type="number" id="max-price-input" name="max_price" placeholder="Max Price"
+                class="form-control fw-semibold" value="{{ request.GET.max_price|default:'' }}" min="0" step="500">
+            </div>
+          </div>
+
+          <!-- Quick Preset Chips -->
+          <div class="d-flex flex-wrap gap-1.5 mt-2">
+            <button type="button"
+              class="preset-chip {% if request.GET.min_price == '0' and request.GET.max_price == '10000' %}active{% endif %}"
+              onclick="setPricePreset(0, 10000)">Under ₹10k</button>
+            <button type="button"
+              class="preset-chip {% if request.GET.min_price == '10000' and request.GET.max_price == '30000' %}active{% endif %}"
+              onclick="setPricePreset(10000, 30000)">₹10k - ₹30k</button>
+            <button type="button"
+              class="preset-chip {% if request.GET.min_price == '30000' and request.GET.max_price == '75000' %}active{% endif %}"
+              onclick="setPricePreset(30000, 75000)">₹30k - ₹75k</button>
+            <button type="button"
+              class="preset-chip {% if request.GET.min_price == '75000' and not request.GET.max_price %}active{% endif %}"
+              onclick="setPricePreset(75000, '')">₹75k+</button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="col-lg-3 col-12 d-flex gap-2 align-self-end mt-3 mt-lg-0">
+          <button type="submit" class="btn btn-gradient-primary btn-md flex-grow-1 fs-7 fw-bold py-2">
+            <i class="fa-solid fa-filter me-1"></i> Apply Filter
+          </button>
+          <a href="/" class="btn btn-glass-outline btn-md px-3 fs-7 fw-semibold py-2" title="Reset Filters">
+            <i class="fa-solid fa-rotate-left"></i>
+          </a>
+        </div>
+
+      </div>
+
+    </form>
+
+  </div>
+
+  <!-- ================= ACTIVE SEARCH QUERY & FILTER BANNER ================= -->
+  {% if request.GET.q or request.GET.category or request.GET.min_price or request.GET.max_price or request.GET.sort %}
+  <div class="card border-0 rounded-4 shadow-sm p-3 mb-4" id="search-results-banner"
+    style="background: var(--card-bg); backdrop-filter: blur(20px); border-left: 5px solid var(--accent-color) !important;">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="fw-bold fs-6">
+          <i class="fa-solid fa-magnifying-glass text-primary me-1"></i> Search Results:
+        </span>
+
+        {% if request.GET.q %}
+        <span
+          class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center gap-1">
+          Search: "{{ request.GET.q }}"
+          <a href="?category={{ request.GET.category|default:'' }}&min_price={{ request.GET.min_price|default:'' }}&max_price={{ request.GET.max_price|default:'' }}&sort={{ request.GET.sort|default:'' }}"
+            class="text-primary ms-1"><i class="fa-solid fa-xmark"></i></a>
+        </span>
+        {% endif %}
+
+        {% if request.GET.min_price or request.GET.max_price %}
+        <span
+          class="badge bg-success-subtle text-success rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center gap-1">
+          Price: ₹{{ request.GET.min_price|default:'0' }} - ₹{{ request.GET.max_price|default:'Max' }}
+          <a href="?q={{ request.GET.q|default:'' }}&category={{ request.GET.category|default:'' }}&sort={{ request.GET.sort|default:'' }}"
+            class="text-success ms-1"><i class="fa-solid fa-xmark"></i></a>
+        </span>
+        {% endif %}
+
+        {% if request.GET.sort %}
+        <span
+          class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-3 py-1.5 fs-7 fw-bold d-inline-flex align-items-center gap-1">
+          Sort: {{ request.GET.sort|title }}
+        </span>
+        {% endif %}
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-primary rounded-pill px-3 py-1.5 fw-bold fs-7">{{ products|length }} Items Found</span>
+        <a href="/" class="btn btn-outline-danger btn-sm rounded-pill px-3 fs-7 fw-semibold">Clear Search</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ================= RECENTLY VIEWED ================= -->
+  {% if recent_products %}
+  <div class="mb-5">
+    <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+      <i class="fa-solid fa-clock-rotate-left text-primary"></i> Recently Viewed
+    </h5>
+
+    <div class="row g-3">
+      {% for item in recent_products %}
+      <div class="col-xl-3 col-lg-4 col-sm-6 col-12">
+        <div class="product-card-premium p-3 text-center">
+          <div class="card-img-wrapper mb-2" style="height: 130px;">
+            {% if item.product.images.first %}
+            <img src="{{ item.product.images.first.image.url }}" class="card-img-premium" alt="{{ item.product.name }}">
+            {% elif item.product.image_url %}
+            <img src="{{ item.product.image_url }}" class="card-img-premium" alt="{{ item.product.name }}">
+            {% else %}
+            <i class="fa-solid fa-box-open fs-1 text-muted"></i>
+            {% endif %}
+          </div>
+
+          <a href="/product/{{ item.product.id }}/" class="product-title text-truncate d-block mb-1">
+            {{ item.product.name }}
+          </a>
+          <div class="product-price-premium mb-0 fs-6">₹{{ item.product.price }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ================= POPULAR PRODUCTS ================= -->
+  {% if popular_products %}
+  <div class="mb-5">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h4 class="fw-extrabold mb-0 d-flex align-items-center gap-2" style="letter-spacing: -0.5px;">
+        <i class="fa-solid fa-fire text-danger"></i> Popular Products
+      </h4>
+      <span class="badge bg-warning-subtle text-warning-emphasis fw-bold rounded-pill px-3 py-1.5">Top Views</span>
+    </div>
+
+    <div class="row g-4">
+      {% for product in popular_products %}
+      <div class="col-xl-3 col-lg-4 col-sm-6 col-12">
+        <div class="product-card-premium p-3" data-url="/product/{{ product.id }}/">
+          <span class="badge-trending"><i class="fa-solid fa-fire me-1"></i> POPULAR</span>
+          <a href="/wishlist/{{ product.id }}/" class="wishlist-float-btn" title="Save to Wishlist">
+            <i class="fa-solid fa-heart {% if product.id in wishlist_product_ids %}text-danger{% endif %}"></i>
+          </a>
+
+          <div class="card-img-wrapper mb-3">
+            {% if product.images.first %}
+            <img src="{{ product.images.first.image.url }}" class="card-img-premium" alt="{{ product.name }}">
+            {% elif product.image_url %}
+            <img src="{{ product.image_url }}" class="card-img-premium" alt="{{ product.name }}">
+            {% else %}
+            <i class="fa-solid fa-image fs-1 text-muted"></i>
+            {% endif %}
+          </div>
+
+          <div class="flex-grow-1 d-flex flex-column justify-content-between">
+            <div>
+              <span class="text-muted fs-7 fw-semibold text-uppercase d-block mb-1">{{ product.category.name }}</span>
+              <a href="/product/{{ product.id }}/" class="product-title d-block mb-2 text-truncate"
+                title="{{ product.name }}">
+                {{ product.name }}
+              </a>
+            </div>
+
+            <div>
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="product-price-premium">₹{{ product.price }}</div>
+                <div class="text-warning fs-7 fw-bold">
+                  <i class="fa-solid fa-star"></i> 4.9
+                </div>
+              </div>
+
+              <div class="d-flex gap-2">
+                <a href="/orders/add/{{ product.id }}/" class="btn btn-gradient-primary flex-grow-1 py-2 fs-7 fw-bold">
+                  <i class="fa-solid fa-cart-plus me-1"></i> Add
+                </a>
+                <a href="/product/{{ product.id }}/" class="btn btn-glass-outline px-3 py-2 fs-7 fw-semibold"
+                  title="View Details">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ================= ALL PRODUCTS ================= -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="fw-extrabold mb-0 d-flex align-items-center gap-2" style="letter-spacing: -0.5px;">
+      <i class="fa-solid fa-boxes-stacked text-primary"></i> All Products
+    </h4>
+    <span class="text-muted fs-7 fw-semibold">Showing {{ products|length }} items</span>
+  </div>
+
+  <div class="row g-4">
+    {% for product in products %}
+    <div class="col-xl-3 col-lg-4 col-sm-6 col-12">
+      <div class="product-card-premium p-3" data-url="/product/{{ product.id }}/">
+        <span class="badge-stock"><i class="fa-solid fa-circle-check me-1"></i> In Stock</span>
+        <a href="/wishlist/{{ product.id }}/" class="wishlist-float-btn" title="Save to Wishlist">
+          <i class="fa-solid fa-heart {% if product.id in wishlist_product_ids %}text-danger{% endif %}"></i>
+        </a>
+
+        <div class="card-img-wrapper mb-3">
+          {% if product.images.first %}
+          <img src="{{ product.images.first.image.url }}" class="card-img-premium" alt="{{ product.name }}">
+          {% elif product.image_url %}
+          <img src="{{ product.image_url }}" class="card-img-premium" alt="{{ product.name }}">
+          {% else %}
+          <i class="fa-solid fa-image fs-1 text-muted"></i>
+          {% endif %}
+        </div>
+
+        <div class="flex-grow-1 d-flex flex-column justify-content-between">
+          <div>
+            <span class="text-muted fs-7 fw-semibold text-uppercase d-block mb-1">{{ product.category.name }}</span>
+            <a href="/product/{{ product.id }}/" class="product-title d-block mb-2 text-truncate"
+              title="{{ product.name }}">
+              {{ product.name }}
+            </a>
+          </div>
+
+          <div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div class="product-price-premium">₹{{ product.price }}</div>
+              <div class="text-warning fs-7 fw-bold">
+                <i class="fa-solid fa-star"></i> 4.8
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <a href="/orders/add/{{ product.id }}/" class="btn btn-gradient-primary flex-grow-1 py-2 fs-7 fw-bold">
+                <i class="fa-solid fa-cart-plus me-1"></i> Add
+              </a>
+              <a href="/product/{{ product.id }}/" class="btn btn-glass-outline px-3 py-2 fs-7 fw-semibold"
+                title="View Details">
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="card border-0 rounded-4 shadow-sm p-5 text-center" style="background: var(--card-bg);">
+        <i class="fa-solid fa-magnifying-glass-minus text-muted display-4 mb-3"></i>
+        <h5 class="fw-bold">No Products Found</h5>
+        <p class="text-muted mb-3">Try adjusting your search terms or filters.</p>
+        <div>
+          <a href="/" class="btn btn-gradient-primary px-4">Reset All Filters</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- ================= PAGINATION ================= -->
+  {% if products.paginator.num_pages > 1 %}
+  <div class="mt-5 d-flex justify-content-center gap-3 align-items-center">
+    {% if products.has_previous %}
+    <a class="btn btn-glass-outline px-4"
+      href="?page={{ products.previous_page_number }}&sort={{ request.GET.sort }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}&category={{ request.GET.category }}">
+      <i class="fa-solid fa-chevron-left me-1"></i> Prev
+    </a>
+    {% endif %}
+
+    <span class="badge rounded-pill px-3 py-2 bg-primary-subtle text-primary fw-bold">
+      Page {{ products.number }} of {{ products.paginator.num_pages }}
+    </span>
+
+    {% if products.has_next %}
+    <a class="btn btn-glass-outline px-4"
+      href="?page={{ products.next_page_number }}&sort={{ request.GET.sort }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}&category={{ request.GET.category }}">
+      Next <i class="fa-solid fa-chevron-right ms-1"></i>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
 
 </div>
 
-
-<!-- ================= RIGHT CONTENT ================= -->
-<div class="col-lg-9 col-md-8 col-12">
-
-<!-- ================= FILTER BAR ================= -->
-
-<form method="get" class="pro-filter mb-4 d-flex flex-wrap align-items-center gap-2">
-
-<input type="hidden" name="q" value="{{ request.GET.q|default:'' }}">
-<input type="hidden" name="category" value="{{ request.GET.category|default:'' }}">
-
-<select name="sort" class="form-select" style="width:180px;">
-<option value="">Sort by price</option>
-<option value="low" {% if request.GET.sort == "low" %}selected{% endif %}>Low to High</option>
-<option value="high" {% if request.GET.sort == "high" %}selected{% endif %}>High to Low</option>
-</select>
-
-<input type="number" name="min_price" placeholder="Min price"
-class="form-control" style="width:140px;"
-value="{{ request.GET.min_price|default:'' }}">
-
-<input type="number" name="max_price" placeholder="Max price"
-class="form-control" style="width:140px;"
-value="{{ request.GET.max_price|default:'' }}">
-
-<div class="d-flex gap-2">
-<button class="btn btn-primary px-4">Apply</button>
-
-<a href="/" class="btn btn-outline-secondary px-4">
-Reset
-</a>
-</div>
-
-</form>
-
-
-<!-- ================= RECENTLY VIEWED ================= -->
-
-{% if recent_products %}
-<h4 class="mb-3 fw-bold">Recently Viewed</h4>
-
-<div class="row g-3 mb-4">
-
-{% for item in recent_products %}
-<div class="col-lg-3 col-md-4 col-sm-6 col-6">
-
-<div class="card product-card glass hover-card shadow-sm p-3 h-100 text-center">
-
-{% if item.product.images.first %}
-<img src="{{ item.product.images.first.image.url }}"
-style="height:130px;object-fit:contain;" class="img-hover">
-
-{% elif item.product.image_url %}
-<img src="{{ item.product.image_url }}"
-style="height:130px;object-fit:contain;" class="img-hover">
-
-{% else %}
-<img src="https://via.placeholder.com/130">
-{% endif %}
-
-<h6 class="text-truncate mb-1">
-<a href="/product/{{ item.product.id }}/"
-class="text-decoration-none text-dark fw-semibold">
-{{ item.product.name }}
-</a>
-</h6>
-
-<p class="price mb-0">₹{{ item.product.price }}</p>
-
-</div>
-
-</div>
-{% endfor %}
-
-</div>
-<hr>
-{% endif %}
-
-
-<!-- ================= POPULAR PRODUCTS ================= -->
-
-<h4 class="mt-4 mb-3 fw-bold">🔥 Popular Products</h4>
-
-<div class="row g-3 mb-4">
-
-{% for product in popular_products %}
-<div class="col-lg-3 col-md-4 col-sm-6 col-6">
-
-<div class="card product-card glass hover-card shadow-sm p-3 h-100 text-center">
-
-{% if product.images.first %}
-<img src="{{ product.images.first.image.url }}"
-class="img-fluid rounded mb-2 img-hover"
-style="height:180px;object-fit:contain;">
-
-{% elif product.image_url %}
-<img src="{{ product.image_url }}"
-class="img-fluid rounded mb-2 img-hover"
-style="height:180px;object-fit:contain;">
-
-{% else %}
-<img src="https://via.placeholder.com/180?text=No+Image"
-class="img-fluid rounded mb-2">
-{% endif %}
-
-<h6 class="text-truncate mb-1">
-<a href="/product/{{ product.id }}/"
-class="text-decoration-none text-dark fw-semibold">
-{{ product.name }}
-</a>
-</h6>
-
-<p class="price mb-0">₹{{ product.price }}</p>
-
-</div>
-
-</div>
-{% endfor %}
-
-</div>
-
-<hr>
-
-
-<!-- ================= PRODUCTS ================= -->
-
-<h3 class="mb-3 fw-bold">Products</h3>
-
-<div class="row g-4">
-
-{% for product in products %}
-<div class="col-lg-3 col-md-4 col-sm-6 col-12">
-
-<div class="card product-card glass hover-card shadow-sm h-100 text-center p-3">
-
-{% if product.images.first %}
-<img src="{{ product.images.first.image.url }}"
-class="img-fluid rounded mb-2 img-hover"
-style="height:180px;object-fit:contain;">
-
-{% elif product.image_url %}
-<img src="{{ product.image_url }}"
-class="img-fluid rounded mb-2 img-hover"
-style="height:180px;object-fit:contain;">
-
-{% else %}
-<img src="https://via.placeholder.com/180?text=No+Image"
-class="img-fluid rounded mb-2">
-{% endif %}
-
-<h6 class="mt-2 text-truncate">
-<a href="/product/{{ product.id }}/"
-class="text-decoration-none text-dark fw-semibold">
-{{ product.name }}
-</a>
-</h6>
-
-<p class="price mb-3">₹{{ product.price }}</p>
-
-<a href="/product/{{ product.id }}/"
-class="btn btn-outline-primary btn-sm w-100">
-View Details
-</a>
-
-</div>
-
-</div>
-{% endfor %}
-
-</div>
-
-{% if not products %}
-<p class="text-muted mt-3">No products found.</p>
-{% endif %}
-
-
-<!-- ================= PAGINATION ================= -->
-
-{% if products.paginator.num_pages > 1 %}
-
-<div class="mt-5 d-flex justify-content-center gap-3 flex-wrap align-items-center">
-
-{% if products.has_previous %}
-<a class="btn btn-outline-secondary"
-href="?page={{ products.previous_page_number }}&sort={{ request.GET.sort }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}&category={{ request.GET.category }}">
-Prev
-</a>
-{% endif %}
-
-<span class="fw-semibold">
-Page {{ products.number }} of {{ products.paginator.num_pages }}
-</span>
-
-{% if products.has_next %}
-<a class="btn btn-outline-secondary"
-href="?page={{ products.next_page_number }}&sort={{ request.GET.sort }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}&category={{ request.GET.category }}">
-Next
-</a>
-{% endif %}
-
-</div>
-
-{% endif %}
-
-</div>
-</div>
+<style>
+  .category-pills-wrapper::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .category-pills-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.3);
+    border-radius: 10px;
+  }
+
+  .category-pill {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    padding: 8px 18px;
+    border-radius: 30px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+  }
+
+  body.dark .category-pill {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .category-pill:hover {
+    background: var(--badge-bg);
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+  }
+
+  .category-pill.active-pill {
+    background: var(--primary-gradient) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 15px var(--accent-glow);
+    font-weight: 700;
+  }
+
+  /* Preset Chips */
+  .preset-chip {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--card-border);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  body.dark .preset-chip {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .preset-chip:hover {
+    background: var(--badge-bg);
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+  }
+
+  .preset-chip.active {
+    background: var(--primary-gradient) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    font-weight: 700;
+    box-shadow: 0 4px 12px var(--accent-glow);
+  }
+
+  /* Hero Banner Image Right Side Styling */
+  .hero-banner-img {
+    max-height: 200px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 20px !important;
+    border: 1px solid rgba(99, 102, 241, 0.3) !important;
+    box-shadow: 0 15px 35px rgba(99, 102, 241, 0.25) !important;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .hero-banner-img:hover {
+    transform: scale(1.03);
+    box-shadow: 0 20px 45px rgba(99, 102, 241, 0.4) !important;
+  }
+</style>
+
+<script>
+  function setPricePreset(min, max) {
+    document.getElementById("min-price-input").value = min || '';
+    document.getElementById("max-price-input").value = max || '';
+    document.getElementById("filter-form").submit();
+  }
+
+  function updatePriceDisplay() {
+    const minVal = document.getElementById("min-price-input").value;
+    const maxVal = document.getElementById("max-price-input").value;
+    const display = document.getElementById("price-range-display");
+    if (display) {
+      if (minVal && maxVal) {
+        display.textContent = `₹${Number(minVal).toLocaleString('en-IN')} - ₹${Number(maxVal).toLocaleString('en-IN')}`;
+      } else if (minVal) {
+        display.textContent = `Above ₹${Number(minVal).toLocaleString('en-IN')}`;
+      } else if (maxVal) {
+        display.textContent = `Under ₹${Number(maxVal).toLocaleString('en-IN')}`;
+      } else {
+        display.textContent = `All Prices`;
+      }
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const minInp = document.getElementById("min-price-input");
+    const maxInp = document.getElementById("max-price-input");
+    if (minInp && maxInp) {
+      minInp.addEventListener("input", updatePriceDisplay);
+      maxInp.addEventListener("input", updatePriceDisplay);
+      updatePriceDisplay();
+    }
+
+    // Smooth Auto-scroll to Search Results below Filter Panel
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("q") || urlParams.has("category") || urlParams.has("min_price") || urlParams.has("max_price") || urlParams.has("sort")) {
+      const banner = document.getElementById("search-results-banner") || document.getElementById("products-section");
+      if (banner) {
+        setTimeout(() => {
+          banner.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 250);
+      }
+    }
+  });
+</script>
 
 {% endblock %}

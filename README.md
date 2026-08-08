@@ -1,154 +1,117 @@
-# 🛒 NEXUS MART — Full-Stack E-Commerce Platform
+# 🛒 NEXUS MART — Next-Gen Full-Stack E-Commerce Platform
 
-🌐 Live Demo: https://lnkd.in/gJRHxh5E
+![Django](https://img.shields.io/badge/Django-5.2-092E20?style=for-the-badge&logo=django&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
+![UI/UX](https://img.shields.io/badge/UI/UX-Glassmorphism-violet?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge)
 
-A feature-rich e-commerce web application built with **Django** and **PostgreSQL**, featuring smart product search, AI-powered recommendations, an intelligent chatbot, secure checkout with multiple payment options, and an admin analytics dashboard.
-
-> 🎓 Group Project | Built with Django 5.2 • PostgreSQL • Bootstrap 5 • 
-
----
-
-## ✨ Features
-
-### 🔍 Smart Search & Autocomplete
-- **Live autocomplete** — instant product suggestions as you type (AJAX-powered)
-- **Full-text search** using PostgreSQL `SearchVector` with weighted ranking (name = A, description = B) and GIN indexing
-- **Multi-filter search** — filter by category, price range, and sorting (low-to-high, high-to-low, newest)
-- **Paginated results** — 8 products per page with full pagination support
-
-### 🧠 Similar Product Recommendations
-- **Category-based recommendations** on the product detail page — shows 4 related products from the same category
-- **Cosine similarity engine** — NumPy-based recommendation system using one-hot encoded category + product specifications to compute feature vectors and rank by cosine similarity
-
-### 🕒 Recently Viewed Products
-- Automatically tracks products viewed by authenticated users
-- **Deduplication** — viewing the same product again moves it to the top instead of creating duplicates
-- **Auto-cleanup** — keeps only the 5 most recent views per user
-- Displayed on both **home page** and **search results page**, with optional category filtering
-
-### 🔥 Popular Products
-- **View counter** on every product, incremented atomically using Django's `F()` expression (race-condition safe)
-- Products ranked by most views and displayed on the home page
-- Supports **category-based filtering** — shows popular products within the selected category
-
-### 🛒 Cart & Checkout System
-- Add to cart, update quantity (+/-), remove items
-- **Stock validation** before checkout — prevents ordering more than available inventory
-- **Checkout form** with name, email, phone (Indian mobile validation), and address
-- **Atomic transactions** — uses `@transaction.atomic` for data integrity during order placement
-
-### 💳 Payment System
-- **Multiple payment methods**: QR Payment, Card Payment, Cash on Delivery (COD)
-- **QR payment summary page** with order details and confirmation
-
-### ❤️ Wishlist
-- Toggle products in/out of wishlist
-- Dedicated **wishlist page** showing all saved products
-- Unique constraint per user-product pair
-
-### ⭐ Reviews & Ratings
-- Authenticated users can rate products (1–5 stars) and leave comments
-- **Average rating** calculated and displayed on product detail page
-- One review per user per product (update on re-submit)
-
-### 🤖 AI Chatbot
-- Built-in chatbot assistant accessible from every page
-- **Natural language understanding** — handles queries like "best phone", "cheap laptop under 50000", "iphone features"
-- **Category intelligence** — maps aliases ("mobile" → "Phones & Accessories") to real DB categories
-- **Smart responses** — cheapest/expensive/best products, products under a price, product features/specs
-- Renders clickable product links in chat responses
-
-### 👤 User Management
-- **Registration** with name, email, password
-- **Login/Logout** with session management
-- **User profile** — editable name, phone (Indian mobile validation), address
-- Profile auto-created via Django signals on registration
-
-### 📊 Admin Analytics Dashboard
-- **Staff-only** dashboard with sales insights
-- **Sales per day** and **orders per day** charts (JSON data for JS rendering)
-- **Total revenue** and **total orders** summary
-- **Top 5 best-selling products** by quantity sold
-- **AI-style insights** — detects if sales are increasing or decreasing
-
-### 🎨 UI/UX
-- **Dark/Light mode** toggle with localStorage persistence
-- **Responsive design** — works on mobile, tablet, and desktop
-- **Glassmorphism** cards with hover animations
-- **Fixed bottom bar** for Wishlist and Cart access
-- **Image gallery** with carousel and fullscreen zoom modal on product detail page
-- Bootstrap 5 + Google Fonts (Inter)
+**NEXUS MART** is a feature-rich, high-performance E-Commerce platform built with **Django** and modern **Vanilla CSS Glassmorphism**. Designed for ultra-smooth user experience, it features zero-reload AJAX cart/wishlist management, real-time instant search autocomplete, persistent viewport-fixed AI Shopping Assistant, responsive 4-column product grid, and interactive price filtering.
 
 ---
 
-## 🏗️ Tech Stack
+## 🌟 Key Platform Features
 
-| Layer | Technology |
-|-------|-----------|
-| **Backend** | Django 5.2 (Python) |
-| **Database** | PostgreSQL with full-text search |
-| **Frontend** | HTML, CSS, JavaScript, Bootstrap 5 |
-| **Image Handling** | Pillow |
-| **Static Files** | WhiteNoise |
-| **Deployment** | Gunicorn + WhiteNoise |
+### 🚀 1. Zero-Reload SPA Performance (AJAX Engine)
+- **Instant Shopping Actions**: Add to Cart, Wishlist toggling, and Cart Quantity (+/-) operate seamlessly without full-page reloads.
+- **Dynamic Cart Badges & Toasts**: Instant real-time updates to cart counter badges and 3D animated toast notifications.
 
----
+### 🔍 2. Real-Time Instant Search & Autocomplete
+- **Live Search Dropdown**: Interactive preview box directly below search bar showing product thumbnails, titles, category badges, and prices (`₹`).
+- **Click-Outside & Re-Focus Restore**: Preserves typed input query when clicking outside, and instantly re-opens search preview when re-focusing on the search bar.
+- **Search Results Banner & Auto-Scroll**: Active search query tags with 1-click removal and smooth automatic scrolling to search results below the filter panel.
 
-## 📁 Project Structure
+### 🤖 3. Persistent Viewport-Fixed AI Shopping Assistant
+- **Pinned Assistant Drawer**: Fixed bottom-right positioning (`position: fixed !important; z-index: 99999 !important;`) isolated from page transforms.
+- **Always Accessible**: Remains statically pinned to screen across all scroll positions and route navigation transitions.
 
-```
-NEXUS_MART/
-├── config/          # Django settings, root URLs, admin dashboard context
-├── products/        # Product, Category, Wishlist, Review, RecentlyViewed models & views
-│   └── services/    # Recommendation engine (cosine similarity)
-├── search/          # Autocomplete, search results, SearchHistory model
-├── orders/          # Cart, checkout, payment, order tracking
-├── users/           # Registration, login, profile management
-├── chatbot/         # AI chatbot with NLP-style bot logic
-├── analytics_app/   # Admin analytics dashboard
-├── templates/       # All HTML templates (base, products, orders, users, analytics)
-├── static/          # Static assets
-├── media/           # Uploaded product images
-└── manage.py
-```
+### 🎨 4. Modern Glassmorphism Design System
+- **Dark/Light Mode Theme Engine**: Smooth dark mode toggle with high-contrast text styling across all inputs, tables, cards, and dropdowns.
+- **Responsive 4-Column Product Grid**: Optimized grid layout (`col-xl-3 col-lg-4 col-sm-6`) replacing vertical sidebar empty spaces.
+- **3D Bounce Animated Toast System**: Custom glassmorphic alert notifications with 5-second progress bar timer.
+- **Interactive Price Filtering**: Live price display slider, preset quick chips (Under ₹10k, ₹10k - ₹30k, ₹30k - ₹75k, ₹75k+), and currency input badges.
+
+### ❤️ 5. Synchronized Database-to-UI Wishlist State
+- **Persistent Heart Status**: User wishlist product IDs are queried in Django views (`wishlist_product_ids`), ensuring heart icons remain filled red (`text-danger`) across page refreshes and detail views.
+- **Full-Card Click Navigation**: Clicking anywhere on product cards (`data-url`) opens detail pages while preserving individual action buttons.
+
+### ⬅️ 6. Universal Navigation & Back Buttons
+- Glassmorphic **`← Back`** buttons integrated across Product Detail, Shopping Cart, Checkout, Orders, Order Details, Payment, Profile, Wishlist, and Analytics pages.
 
 ---
 
-## ⚙️ Setup & Installation
+## 🐛 Resolved Issues & Technical Changelog
 
+| Issue # | Reported Issue | Technical Resolution |
+| :--- | :--- | :--- |
+| `#1` | **Tall Empty Sidebar & Dark Mode Text Visibility** | Removed vertical sidebar in favor of a horizontal Category Pills Bar. Expanded grid to 4-column responsive layout. Enforced `#f8fafc` text contrast in dark theme. |
+| `#2` | **Full Page Reloads on Clicks** | Implemented global JS event delegation intercepting Add to Cart, Wishlist, and Quantity (+/-) links, returning Django `JsonResponse`. |
+| `#3` | **Alert System Animations** | Built a custom 3D spring entrance/slide-out exit Toast Notification system with 5s progress bar timer. |
+| `#4` | **Price Filter UI Polish** | Added Quick Preset Price Chips (`Under ₹10k`, `₹10k - ₹30k`, `₹30k - ₹75k`, `₹75k+`), currency badges, and live display. |
+| `#5` | **Search Results Display Location** | Added an active Search Query & Filter Status Banner right below filter panel with smooth `scrollIntoView()` auto-scroll. |
+| `#6` | **AI Chatbot Screen Drift** | Isolated CSS `transform` from `body` onto `.page-content-wrapper` so `position: fixed` chatbot widget stays statically pinned to viewport window. |
+| `#7` | **Full-Card Click Navigation** | Implemented `data-url` event delegation on `.product-card-premium` cards while protecting action buttons. |
+| `#8` | **Missing Back Navigation** | Added glassmorphic `← Back` buttons across all secondary and detail views. |
+| `#9` | **Wishlist Database-to-UI State Sync** | Queried `wishlist_product_ids` in Django `home` and `detail` views so wishlisted items remain filled red (`text-danger`) on page refresh. |
+| `#10` | **Search Box Blur & Re-Focus Behavior** | Preserved typed search text on click-outside and restored autocomplete dropdown upon re-focusing search input. |
+| `#11` | **3D Logo & Hero Showcase Banner** | Generated futuristic 3D NEXUS MART brand logo and embedded right-side Welcome showcase banner into home page grid. |
+
+---
+
+## 🛠️ Technology Stack
+
+- **Backend**: Python 3.11+, Django 4.2+ / 5.2
+- **Frontend**: HTML5, Vanilla JavaScript (ES6+), Bootstrap 5.3, Vanilla CSS3 (Glassmorphism, Animations)
+- **Icons & Fonts**: FontAwesome 6 Free, Plus Jakarta Sans (Google Fonts)
+- **Database**: SQLite (Development) / PostgreSQL (Production)
+- **Static Assets**: WhiteNoise Static File Storage
+
+---
+
+## 💻 Installation & Local Development Setup
+
+### 1. Clone Repository
 ```bash
-# 1. Clone the repository
-git clone https://github.com/Mr-HarshRaval07/NEXUS_HUB.git
-cd NEXUS_HUB
+git clone https://github.com/NeelPanchal1812/NexusMart.git
+cd NexusMart
+```
 
-# 2. Create virtual environment
+### 2. Create & Activate Virtual Environment
+```bash
+# Windows
 python -m venv venv
-venv\Scripts\activate        # Windows
-# source venv/bin/activate   # Mac/Linux
+venv\Scripts\activate
 
-# 3. Install dependencies
+# macOS / Linux
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+```bash
 pip install -r requirements.txt
+```
 
-# 4. Set up PostgreSQL database
-# Create a database and set the DATABASE_URL environment variable:
-set DATABASE_URL=postgres://user:password@localhost:5432/nexus_mart
-
-# 5. Run migrations
+### 4. Run Migrations & Setup Database
+```bash
 python manage.py migrate
+```
 
-# 6. Create superuser (for admin access)
+### 5. Create Superuser (Optional Admin Access)
+```bash
 python manage.py createsuperuser
+```
 
-# 7. Run the server
+### 6. Start Development Server
+```bash
 python manage.py runserver
 ```
+Visit `http://127.0.0.1:8000/` in your browser!
 
 ---
 
-|
+## 👤 Author & Maintainer
 
----
-
-## 📄 License
-
-This project was built as a group project for academic purposes.
+- **Developer**: Neel Panchal
+- **Repository**: [https://github.com/NeelPanchal1812/NexusMart](https://github.com/NeelPanchal1812/NexusMart)
+- **License**: MIT License

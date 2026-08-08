@@ -9,6 +9,8 @@ from products.models import Product
 from .models import Order, OrderItem, CartItem
 
 
+from django.http import JsonResponse
+
 # ================= ADD TO CART =================
 
 @login_required
@@ -27,6 +29,15 @@ def add_to_cart(request, product_id):
         cart_item.quantity += 1
 
     cart_item.save()
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('ajax') == '1':
+        cart_count = sum(item.quantity for item in CartItem.objects.filter(user=request.user))
+        return JsonResponse({
+            'success': True,
+            'message': f'"{product.name}" added to cart! 🛒',
+            'cart_count': cart_count,
+            'quantity': cart_item.quantity
+        })
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
@@ -51,22 +62,42 @@ def view_cart(request):
 @login_required
 def update_cart(request, item_id, action):
 
-    item = get_object_or_404(CartItem, id=item_id, user=request.user)
+    item = CartItem.objects.filter(id=item_id, user=request.user).first()
+    if not item:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('ajax') == '1':
+            return JsonResponse({'success': False, 'message': 'Item not found'}, status=404)
+        return redirect("/orders/cart/")
 
     if action == "plus":
         item.quantity += 1
+        item.save()
 
     elif action == "minus":
         item.quantity -= 1
         if item.quantity <= 0:
             item.delete()
-            return redirect("/orders/cart/")
+            item = None
+        else:
+            item.save()
 
     elif action == "remove":
         item.delete()
-        return redirect("/orders/cart/")
+        item = None
 
-    item.save()
+    items = CartItem.objects.select_related("product").filter(user=request.user)
+    total = sum(i.product.price * i.quantity for i in items)
+    cart_count = sum(i.quantity for i in items)
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('ajax') == '1':
+        return JsonResponse({
+            'success': True,
+            'action': action,
+            'quantity': item.quantity if item else 0,
+            'subtotal': (item.product.price * item.quantity) if item else 0,
+            'total': total,
+            'cart_count': cart_count
+        })
+
     return redirect("/orders/cart/")
 
 

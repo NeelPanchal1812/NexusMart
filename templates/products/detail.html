@@ -1,366 +1,274 @@
 {% extends "base.html" %}
 {% block content %}
 
-<style>
+<!-- Top Navigation Bar with Back Button & Breadcrumb -->
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+  <button onclick="window.history.length > 1 ? history.back() : window.location.href='/'" class="btn btn-glass-outline btn-sm px-3 py-1.5 rounded-pill fw-semibold">
+    <i class="fa-solid fa-arrow-left me-1"></i> Back
+  </button>
+  
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-transparent p-0 m-0">
+      <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted"><i class="fa-solid fa-house me-1"></i> Home</a></li>
+      <li class="breadcrumb-item"><a href="/?category={{ product.category.id }}" class="text-decoration-none text-muted">{{ product.category.name }}</a></li>
+      <li class="breadcrumb-item active text-primary fw-semibold" aria-current="page">{{ product.name }}</li>
+    </ol>
+  </nav>
+</div>
 
-/* ================= LEVEL 3 DETAIL PAGE ================= */
+<div class="row g-4">
 
-.product-main-img{
-    max-height:420px;
-    object-fit:contain;
-    cursor:zoom-in;
-    transition:.35s ease;
-}
-.product-main-img:hover{
-    transform:scale(1.03);
-}
+  <!-- ================= PRODUCT IMAGES GALLERY ================= -->
+  <div class="col-lg-6">
+    <div class="card border-0 rounded-4 shadow-lg p-4 text-center h-100 justify-content-center" style="background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border) !important;">
+      
+      <div id="productCarousel" class="carousel slide">
+        <div class="carousel-inner">
+          {% if product.images.exists %}
+            {% for img in product.images.all %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="zoom-trigger p-3" style="cursor: zoom-in;">
+                  <img src="{{ img.image.url }}" class="img-fluid rounded-4" style="max-height: 380px; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15)); transition: transform 0.3s ease;">
+                </div>
+              </div>
+            {% endfor %}
+          {% elif product.image_url %}
+            <div class="carousel-item active">
+              <div class="zoom-trigger p-3">
+                <img src="{{ product.image_url }}" class="img-fluid rounded-4" style="max-height: 380px; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));">
+              </div>
+            </div>
+          {% else %}
+            <div class="carousel-item active">
+              <div class="p-5">
+                <i class="fa-solid fa-box-open text-muted" style="font-size: 5rem;"></i>
+              </div>
+            </div>
+          {% endif %}
+        </div>
 
-.carousel-control-custom{
-    width:48px;
-    height:48px;
-    background:rgba(0,0,0,.7);
-    border-radius:50%;
-    top:50%;
-    transform:translateY(-50%);
-}
-
-.zoom-img{
-    transition: transform .35s ease;
-    cursor:zoom-in;
-}
-
-/* ⭐ Pro review cards */
-
-.review-box{
-    border-radius:18px;
-    background:var(--card);
-    backdrop-filter:blur(18px);
-    box-shadow:0 15px 35px rgba(0,0,0,.12);
-    border:none;
-}
-
-/* ⭐ Specifications table */
-
-.table{
-    background:var(--card);
-    backdrop-filter:blur(12px);
-    border-radius:14px;
-    overflow:hidden;
-}
-
-/* ⭐ Similar product cards */
-
-.similar-card{
-    border-radius:20px;
-    background:var(--card);
-    box-shadow:0 18px 45px rgba(0,0,0,.15);
-    transition:.35s;
-}
-.similar-card:hover{
-    transform:translateY(-8px);
-}
-
-</style>
-
-<div class="row pro-section glass">
-
-
-<!-- ================= IMAGES ================= -->
-
-<div class="col-md-6">
-
-<div id="productCarousel" class="carousel slide">
-
-<div class="carousel-inner">
-
-{% if product.images.exists %}
-  {% for img in product.images.all %}
-    <div class="carousel-item {% if forloop.first %}active{% endif %}">
-      <div class="zoom-trigger text-center">
-        <img src="{{ img.image.url }}"
-             class="d-block w-100 rounded product-main-img">
+        {% if product.images.count > 1 %}
+        <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon rounded-circle p-3" style="background-color: rgba(0,0,0,0.5);"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon rounded-circle p-3" style="background-color: rgba(0,0,0,0.5);"></span>
+        </button>
+        {% endif %}
       </div>
+
     </div>
-  {% endfor %}
+  </div>
 
-{% elif product.image_url %}
-<img src="{{ product.image_url }}"
-class="d-block w-100 rounded product-main-img">
-{% else %}
-<img src="https://via.placeholder.com/400">
-{% endif %}
+  <!-- ================= PRODUCT INFO & ACTIONS ================= -->
+  <div class="col-lg-6">
+    <div class="card border-0 rounded-4 shadow-lg p-4 h-100 d-flex flex-column justify-content-between" style="background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border) !important;">
+      
+      <div>
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="badge rounded-pill px-3 py-1.5" style="background: var(--badge-bg); color: var(--badge-text); font-size: 0.85rem; font-weight: 700;">
+            <i class="fa-solid fa-tag me-1"></i> {{ product.category.name }}
+          </span>
+          <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1.5 fw-bold">
+            <i class="fa-solid fa-circle-check me-1"></i> In Stock ({{ product.inventory }} available)
+          </span>
+        </div>
 
-</div>
+        <h2 class="fw-extrabold mb-3" style="letter-spacing: -0.5px; line-height: 1.25;">
+          {{ product.name }}
+        </h2>
 
-{% if product.images.count > 1 %}
-<button class="carousel-control-prev" type="button" 
-        data-bs-target="#productCarousel" data-bs-slide="prev">
-  <span class="carousel-control-prev-icon carousel-control-custom"></span>
-</button>
+        <!-- Ratings & Views -->
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="d-flex align-items-center gap-1 text-warning fw-bold fs-6">
+            <i class="fa-solid fa-star"></i> {{ avg_rating|default:"4.8" }}
+            <span class="text-muted fw-semibold ms-1">({{ reviews.count }} reviews)</span>
+          </div>
+          <span class="text-muted">•</span>
+          <div class="text-muted fs-7 fw-semibold">
+            <i class="fa-solid fa-eye me-1"></i> {{ product.views }} views
+          </div>
+        </div>
 
-<button class="carousel-control-next" type="button" 
-        data-bs-target="#productCarousel" data-bs-slide="next">
-  <span class="carousel-control-next-icon carousel-control-custom"></span>
-</button>
-{% endif %}
+        <!-- Price Display -->
+        <div class="d-flex align-items-baseline gap-3 mb-4">
+          <div class="display-6 fw-extrabold" style="color: var(--price-tag);">
+            ₹{{ product.price }}
+          </div>
+          <span class="text-muted text-decoration-line-through fs-5">₹{{ product.price|add:"2500" }}</span>
+          <span class="badge bg-danger-subtle text-danger rounded-pill px-2.5 py-1 fw-bold fs-7">Save Special</span>
+        </div>
 
-</div>
+        <!-- Description -->
+        <p class="text-muted fs-6 mb-4" style="line-height: 1.6;">
+          {{ product.description }}
+        </p>
+      </div>
 
-</div>
+      <!-- Actions -->
+      <div class="d-flex flex-wrap gap-3 mt-3 pt-3 border-top" style="border-color: var(--card-border) !important;">
+        <a href="/orders/add/{{ product.id }}/" class="btn btn-gradient-primary btn-lg flex-grow-1 fs-6">
+          <i class="fa-solid fa-cart-plus me-2"></i> Add to Shopping Cart
+        </a>
 
+        {% if user.is_authenticated %}
+        <a href="/wishlist/{{ product.id }}/" class="btn btn-glass-outline btn-lg px-4 fs-6">
+          <i class="fa-solid fa-heart {% if is_in_wishlist %}text-danger{% endif %} me-1"></i> Wishlist
+        </a>
+        {% else %}
+        <a href="/login/?next=/product/{{ product.id }}/" class="btn btn-glass-outline btn-lg px-4 fs-6">
+          <i class="fa-solid fa-heart me-1"></i> Wishlist
+        </a>
+        {% endif %}
+      </div>
 
-<!-- ================= PRODUCT INFO ================= -->
-
-<div class="col-md-6">
-
-<h3 class="fw-bold">{{ product.name }}</h3>
-
-<div class="mb-2">
-
-<strong>{{ avg_rating }}/5</strong>
-
-{% for i in "12345" %}
-  {% if forloop.counter <= avg_rating %}
-    ⭐
-  {% else %}
-    ☆
-  {% endif %}
-{% endfor %}
-
-<span class="text-muted">({{ reviews.count }} reviews)</span>
-
-</div>
-
-<p class="fs-3 fw-bold price">₹{{ product.price }}</p>
-
-<p class="text-muted">{{ product.description }}</p>
-
-<div class="d-flex gap-2 mt-3">
-
-<a href="/orders/add/{{ product.id }}/" class="btn btn-primary px-4">
-Add to Cart
-</a>
-
-{% if user.is_authenticated %}
-<a href="/wishlist/{{ product.id }}/" class="btn btn-outline-danger">
-❤️ Wishlist
-</a>
-{% else %}
-<a href="/login/?next=/product/{{ product.id }}/" class="btn btn-outline-danger">
-❤️ Wishlist
-</a>
-{% endif %}
+    </div>
+  </div>
 
 </div>
-
-</div>
-
-</div>
-
 
 <!-- ================= SPECIFICATIONS ================= -->
-
 {% if product.specifications %}
+<div class="mt-5">
+  <h4 class="fw-bold mb-3 d-flex align-items-center gap-2">
+    <i class="fa-solid fa-sliders text-primary"></i> Technical Specifications
+  </h4>
 
-<h5 class="mt-4 fw-bold">Specifications</h5>
-
-<table class="table table-bordered w-75 glass">
-
-{% for key, value in product.specifications.items %}
-<tr>
-  <th>{{ key|title }}</th>
-  <td>{{ value }}</td>
-</tr>
-{% endfor %}
-
-</table>
-
-<hr>
-
+  <div class="card border-0 rounded-4 shadow-sm overflow-hidden" style="background: var(--card-bg); border: 1px solid var(--card-border) !important;">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" style="background: transparent;">
+        <tbody>
+          {% for key, value in product.specifications.items %}
+          <tr>
+            <th class="ps-4 text-muted fw-semibold" style="width: 30%;">{{ key|title }}</th>
+            <td class="pe-4 fw-bold">{{ value }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 {% endif %}
 
+<!-- ================= CUSTOMER REVIEWS ================= -->
+<div class="mt-5">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h4 class="fw-bold mb-0 d-flex align-items-center gap-2">
+      <i class="fa-solid fa-comments text-primary"></i> Customer Reviews
+    </h4>
+    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1.5 fw-bold">{{ reviews.count }} Verified Reviews</span>
+  </div>
 
-<!-- ================= REVIEWS ================= -->
+  <div class="row g-4">
+    <!-- Reviews List -->
+    <div class="col-lg-7">
+      {% if reviews.exists %}
+        {% for r in reviews %}
+        <div class="card border-0 rounded-4 shadow-sm p-3 mb-3" style="background: var(--card-bg); border: 1px solid var(--card-border) !important;">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px;">
+                {{ r.user.username|first|upper }}
+              </div>
+              <div>
+                <h6 class="fw-bold mb-0">{{ r.user.username }}</h6>
+                <small class="text-muted">{{ r.created_at|date:"M d, Y" }}</small>
+              </div>
+            </div>
 
-<h4 class="mt-4 fw-bold">Customer Reviews</h4>
+            <div class="text-warning fs-7">
+              {% for i in "12345" %}
+                {% if forloop.counter <= r.rating %}
+                  <i class="fa-solid fa-star"></i>
+                {% else %}
+                  <i class="fa-regular fa-star text-muted"></i>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
 
-{% if reviews.exists %}
+          <p class="mb-0 text-muted fs-6">{{ r.comment }}</p>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="card border-0 rounded-4 shadow-sm p-4 text-center text-muted" style="background: var(--card-bg);">
+          <i class="fa-regular fa-comment-dots fs-1 mb-2"></i>
+          <p class="mb-0">No reviews yet. Be the first to leave a review!</p>
+        </div>
+      {% endif %}
+    </div>
 
-{% for r in reviews %}
+    <!-- Review Form -->
+    <div class="col-lg-5">
+      <div class="card border-0 rounded-4 shadow-sm p-4" style="background: var(--card-bg); border: 1px solid var(--card-border) !important;">
+        <h5 class="fw-bold mb-3">Leave a Review</h5>
 
-<div class="p-3 mb-3 review-box hover-card">
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'add_review' product.id %}">
+          {% csrf_token %}
 
-<strong>{{ r.user.username }}</strong>
+          <div class="mb-3">
+            <label class="form-label fw-semibold fs-7">Rating Stars</label>
+            <select name="rating" class="form-select rounded-3" required>
+              <option value="5">⭐⭐⭐⭐⭐ (5 - Excellent)</option>
+              <option value="4">⭐⭐⭐⭐ (4 - Very Good)</option>
+              <option value="3">⭐⭐⭐ (3 - Average)</option>
+              <option value="2">⭐⭐ (2 - Poor)</option>
+              <option value="1">⭐ (1 - Terrible)</option>
+            </select>
+          </div>
 
-<div class="mb-1">
-{% for i in "12345" %}
-  {% if forloop.counter <= r.rating %}
-    ⭐
-  {% else %}
-    ☆
-  {% endif %}
-{% endfor %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold fs-7">Your Review Comments</label>
+            <textarea name="comment" class="form-control rounded-3" rows="3" placeholder="Write your experience..." required></textarea>
+          </div>
+
+          <button class="btn btn-gradient-primary w-100 py-2">Submit Review</button>
+        </form>
+        {% else %}
+        <p class="text-muted mb-3 fs-7">You must be logged in to submit a product review.</p>
+        <a href="/login/?next=/product/{{ product.id }}/" class="btn btn-glass-outline w-100">Log In to Review</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 
-<p class="mb-0">{{ r.comment }}</p>
+<!-- ================= SIMILAR RECOMMENDED PRODUCTS ================= -->
+{% if recommendations %}
+<div class="mt-5">
+  <h4 class="fw-bold mb-3 d-flex align-items-center gap-2">
+    <i class="fa-solid fa-wand-magic-sparkles text-primary"></i> You Might Also Like
+  </h4>
 
-<small class="text-muted">{{ r.created_at|date:"M d, Y" }}</small>
+  <div class="row g-4">
+    {% for p in recommendations %}
+    <div class="col-lg-3 col-sm-6 col-12">
+      <div class="product-card-premium p-3 text-center">
+        <div class="card-img-wrapper mb-3" style="height: 160px;">
+          {% if p.images.first %}
+          <img src="{{ p.images.first.image.url }}" class="card-img-premium" alt="{{ p.name }}">
+          {% elif p.image_url %}
+          <img src="{{ p.image_url }}" class="card-img-premium" alt="{{ p.name }}">
+          {% else %}
+          <i class="fa-solid fa-image fs-1 text-muted"></i>
+          {% endif %}
+        </div>
 
+        <a href="/product/{{ p.id }}/" class="product-title text-truncate d-block mb-1">
+          {{ p.name }}
+        </a>
+        <div class="product-price-premium mb-3 fs-6">₹{{ p.price }}</div>
+
+        <a href="/product/{{ p.id }}/" class="btn btn-glass-outline btn-sm w-100">
+          View Product
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 </div>
-
-{% endfor %}
-
-{% else %}
-<p class="text-muted">No reviews yet. Be the first to review!</p>
 {% endif %}
-
-
-{% if user.is_authenticated %}
-<hr>
-
-<h5>Add Your Review</h5>
-
-<form method="POST" action="{% url 'add_review' product.id %}" class="w-50 glass p-3">
-
-{% csrf_token %}
-
-<label class="form-label">Rating</label>
-<select name="rating" class="form-select mb-2" required>
-<option value="">Select rating</option>
-{% for i in "12345" %}
-<option value="{{ forloop.counter }}">{{ forloop.counter }} ⭐</option>
-{% endfor %}
-</select>
-
-<label class="form-label">Comment</label>
-<textarea name="comment" class="form-control mb-2"
-rows="3"
-placeholder="Share your experience..." required></textarea>
-
-<button class="btn btn-success">Submit Review</button>
-
-</form>
-
-{% else %}
-<p>
-<a href="/login/?next=/product/{{ product.id }}/">Login</a> to write a review.
-</p>
-{% endif %}
-
-
-<!-- ================= SIMILAR ================= -->
-
-<h4 class="mt-5 fw-bold">Similar Products</h4>
-
-<div class="row">
-
-{% for p in recommendations %}
-<div class="col-md-3 mb-3">
-
-<div class="card similar-card p-2 text-center h-100">
-
-{% if p.images.first %}
-<img src="{{ p.images.first.image.url }}"
-     class="img-fluid rounded mb-2"
-     style="height:140px;object-fit:contain;">
-{% else %}
-<img src="https://via.placeholder.com/150"
-     class="img-fluid rounded mb-2">
-{% endif %}
-
-<a href="/product/{{ p.id }}/"
-   class="fw-bold text-decoration-none stretched-link text-dark">
-
-{{ p.name }}
-
-</a>
-
-<p class="fw-semibold mt-2 price">₹{{ p.price }}</p>
-
-</div>
-
-</div>
-{% endfor %}
-
-</div>
-
-
-<!-- ================= ZOOM MODAL ================= -->
-
-<div class="modal fade" id="zoomModal" tabindex="-1">
-<div class="modal-dialog modal-fullscreen">
-<div class="modal-content bg-dark">
-
-<button type="button" class="btn-close btn-close-white ms-auto m-3"
-        data-bs-dismiss="modal"></button>
-
-<div class="modal-body d-flex justify-content-center align-items-center">
-
-<div id="zoomCarousel" class="carousel slide w-100">
-
-<div class="carousel-inner">
-
-{% for img in product.images.all %}
-<div class="carousel-item {% if forloop.first %}active{% endif %}">
-<img src="{{ img.image.url }}" 
-     class="d-block mx-auto zoom-img"
-     style="max-height:90vh;max-width:100%;object-fit:contain;">
-</div>
-{% endfor %}
-
-</div>
-
-<button class="carousel-control-prev" type="button"
-        data-bs-target="#zoomCarousel" data-bs-slide="prev">
-<span class="carousel-control-prev-icon" style="filter:invert(1);"></span>
-</button>
-
-<button class="carousel-control-next" type="button"
-        data-bs-target="#zoomCarousel" data-bs-slide="next">
-<span class="carousel-control-next-icon" style="filter:invert(1);"></span>
-</button>
-
-</div>
-
-</div>
-</div>
-</div>
-</div>
-
-
-<script>
-
-document.addEventListener("DOMContentLoaded", () => {
-
-const zoomModal = new bootstrap.Modal(
-    document.getElementById("zoomModal")
-)
-
-document.querySelectorAll(".zoom-trigger").forEach((box,i)=>{
-    box.onclick = ()=>{
-        zoomModal.show()
-        bootstrap.Carousel
-        .getOrCreateInstance(
-            document.getElementById("zoomCarousel")
-        ).to(i)
-    }
-})
-
-document.querySelectorAll(".zoom-img").forEach(img=>{
-
-    let zoom=false
-
-    img.onclick = e=>{
-        e.stopPropagation()
-        zoom=!zoom
-        img.style.transform = zoom ? "scale(2)" : "scale(1)"
-        img.style.cursor = zoom ? "zoom-out" : "zoom-in"
-    }
-
-})
-
-})
-
-</script>
 
 {% endblock %}

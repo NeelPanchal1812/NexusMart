@@ -16,6 +16,7 @@ urlpatterns = [
 ]
 
 
-# ✅ ADD THIS AT VERY BOTTOM
+# ✅ SERVE MEDIA AND STATIC FILES IN DEV MODE
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.BASE_DIR / 'static')

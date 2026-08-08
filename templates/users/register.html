@@ -1,30 +1,50 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h3>Register</h3>
+<div class="row justify-content-center my-4">
+  <div class="col-lg-5 col-md-7">
 
-<form method="post">
-  {% csrf_token %}
+    <div class="card border-0 rounded-4 shadow-lg p-4 p-md-5" style="background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border) !important;">
+      
+      <div class="text-center mb-4">
+        <div class="brand-icon mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.5rem;">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <h3 class="fw-extrabold mb-1" style="letter-spacing: -0.5px;">Create Account</h3>
+        <p class="text-muted fs-7">Join NEXUS MART for premium e-commerce</p>
+      </div>
 
-  <div class="mb-2">
-    <label>Full Name</label>
-    <input type="text" name="name" class="form-control" required>
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold fs-7"><i class="fa-solid fa-user me-1 text-primary"></i> Full Name</label>
+          <input type="text" name="name" class="form-control form-control-lg rounded-3 fs-6" placeholder="John Doe" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold fs-7"><i class="fa-solid fa-envelope me-1 text-primary"></i> Email Address</label>
+          <input type="email" name="email" class="form-control form-control-lg rounded-3 fs-6" placeholder="name@example.com" required>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold fs-7"><i class="fa-solid fa-key me-1 text-primary"></i> Password</label>
+          <input type="password" name="password" class="form-control form-control-lg rounded-3 fs-6" placeholder="••••••••" required>
+        </div>
+
+        <button class="btn btn-gradient-primary btn-lg w-100 py-3 fs-6 fw-bold mb-3">
+          Register Account <i class="fa-solid fa-arrow-right ms-2"></i>
+        </button>
+
+        <div class="text-center text-muted fs-7">
+          Already have an account? <a href="/login/" class="text-primary fw-bold text-decoration-none">Sign In here</a>
+        </div>
+
+      </form>
+
+    </div>
+
   </div>
-
-  <div class="mb-2">
-    <label>Email</label>
-    <input type="email" name="email" class="form-control" required>
-  </div>
-
-  <div class="mb-2">
-    <label>Password</label>
-    <input type="password" name="password" class="form-control" required>
-  </div>
-
-  <button class="btn btn-primary mt-2">
-    Register
-  </button>
-
-</form>
+</div>
 
 {% endblock %}

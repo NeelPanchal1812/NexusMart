@@ -81,7 +81,12 @@
 }
 </style>
 
-<h3 class="payment-title">Choose Payment Method</h3>
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+  <button onclick="window.history.length > 1 ? history.back() : window.location.href='/orders/my-orders/'" class="btn btn-glass-outline btn-sm px-3 py-1.5 rounded-pill fw-semibold">
+    <i class="fa-solid fa-arrow-left me-1"></i> Back
+  </button>
+  <h3 class="payment-title mb-0">Choose Payment Method</h3>
+</div>
 
 <div class="pay-grid">
 
